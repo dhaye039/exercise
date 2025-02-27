@@ -10,7 +10,7 @@ app.use(express.json());
 // Create a connection pool to MySQL (update credentials as needed)
 let pool = mysql.createPool({
   connectionLimit: 10,
-  host: 'localhost',
+  host: 'mysql1',
   user: 'mysql',
   password: 'mysql',
   database: 'mydb'
