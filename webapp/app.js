@@ -10,10 +10,10 @@ app.use(express.json());
 // Create a connection pool to MySQL (update credentials as needed)
 let pool = mysql.createPool({
   connectionLimit: 10,
-  host: 'YOUR_MYSQL_HOST',
-  user: 'YOUR_MYSQL_USER',
-  password: 'YOUR_MYSQL_PASSWORD',
-  database: 'YOUR_DATABASE_NAME'
+  host: 'localhost',
+  user: 'mysql',
+  password: 'mysql',
+  database: 'mydb'
 });
 
 // POST /registrations endpoint
