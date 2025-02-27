@@ -16,12 +16,10 @@ curl -X POST -d 'firstName=Abe&lastName=Jones&grade=10&email=abejones@gmail.com&
 This command tests an invalid shirt size.
 ```bash
 curl -X POST -d 'firstName=Abe&lastName=Jones&grade=10&email=abejones@gmail.com&shirtSize=XL&hrUsername=ajones' http://161.35.2.185/registrations
-
 ```
 
 ## 1. List All Registrations
 This command retrieves all registration records.
 ```bash
 curl http://161.35.2.185/registrations
-
 ```
