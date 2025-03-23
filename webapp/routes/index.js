@@ -93,22 +93,73 @@ router.get('/details', (req, res) => {
 });
 
 // Mobile search route
-router.get('/mobile_search', (req, res) => {
+router.get('/mobile/search', (req, res) => {
     let title = req.query.title || '';
-    // (Reuse the same validation and search logic)
+    let startIndex = parseInt(req.query.startIndex, 10) || 0;
+    let limit = 10;
+
     if (!title.trim()) {
-        return res.render('mobile_index', { title, results: null, totalCount: 0, error: null });
+        return res.render('mobilesearch', { title, results: null, totalCount: 0, error: null });
     }
-    // Continue with search logic, then render 'mobile_index'
-    Item.search(title, 10, 0, (err, results) => {
-        // ...get count, etc.
-        res.render('mobile_index', { 
-            title, 
-            results, 
-            totalCount, 
-            error: null 
+
+    if (!isValidSearch(title)) {
+        return res.render('mobilesearch', { title, results: null, totalCount: 0, error: "Invalid input! Only letters, numbers, spaces, and apostrophes are allowed." });
+    }
+
+    Item.search(title, limit, startIndex, (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).render('mobilesearch', { title, results: null, totalCount: 0, error: "An error occurred. Please try again." });
+        }
+
+        Item.count(title, (err, totalCount) => {
+            if (err) {
+                console.error("Count query error:", err);
+                return res.status(500).render('mobilesearch', { title, results: null, totalCount: 0, error: "An error occurred. Please try again." });
+            }
+
+            let currentPage = Math.floor(startIndex / limit) + 1;
+            let totalPages = Math.ceil(totalCount / limit);
+            let nextIndex = startIndex + limit < totalCount ? startIndex + limit : null;
+            let prevIndex = startIndex - limit >= 0 ? startIndex - limit : null;
+            let hasPrev = prevIndex !== null;
+
+            res.render('mobilelist', { 
+                title, 
+                results, 
+                totalCount, 
+                startIndex, 
+                nextIndex, 
+                prevIndex,
+                hasPrev,
+                currentPage,
+                totalPages,
+                error: null 
+            });
         });
     });
 });
+
+router.get('/mobile/details', (req, res) => {
+    let bookId = parseInt(req.query.book_id, 10);
+
+    if (isNaN(bookId)) {
+        return res.status(400).send("Invalid request: Missing or incorrect book ID.");
+    }
+
+    Item.getDetails(bookId, (err, book) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).send("An error occurred. Please try again.");
+        }
+
+        if (!book) {
+            return res.status(404).send("Book not found.");
+        }
+
+        res.render('mobiledetails', { book });
+    });
+});
+
 
 module.exports = router;
