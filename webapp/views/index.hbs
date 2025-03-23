@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<HTML>
+  <HEAD>
+    <title>Backwater Creek Community Library - Simple Search</title>
+    <LINK href="/styles.css" type="text/css" rel="stylesheet">
+
+  </HEAD>
+  <body link="#660000">
+<!-- begin header -->
+<table width="100%" border="0">
+	<tr>
+		<td bgColor="#333333" colSpan="2">
+			<font face="arial, helvetica" color="#ffffff">Backwater Creek Community</font>
+		</td>
+	</tr>
+
+	<tr>
+		<td vAlign="top">&nbsp;<a href="/">Search</a> | <a href="mobile_search.html">Mobile</a> | <a href="login.html">Login</a></td>
+		<td align="right">
+			<IMG alt="Backwater Creek Community" src="/logo.jpg">
+		</td>
+	</tr>
+</table>
+<!-- end header -->
+
+<!-- Search form -->
+<form method="get" action="/search">
+    <p>
+        Search by Title:
+        <!-- Initially, value is empty -->
+        <input name="title" type="text" value="{{title}}">
+        <input type="submit" name="btnSearch" value="Search">
+    </p>
+    {{#if error}}
+        <p style="color: red;">{{error}}</p>
+    {{/if}}
+</form>
+
+<!-- Display total number of matches -->
+{{#if results}}
+<p>
+    {{#if hasPrev}}
+        <a href="/search?title={{title}}&startIndex={{prevIndex}}">&lt;&lt; Prev</a>
+    {{/if}}
+
+    Page {{currentPage}} of {{totalPages}} ({{totalCount}} matches)
+
+    {{#if nextIndex}}
+        <a href="/search?title={{title}}&startIndex={{nextIndex}}">Next &gt;&gt;</a>
+    {{/if}}
+</p>
+
+<table id="tblResults" cellspacing="0" cellpadding="5">
+    <tr>
+        <th>Author</th>
+        <th>Title</th>
+    </tr>
+    {{#each results}}
+        <tr>
+            <td>{{this.author}}</td>
+            <td><a href="details?book_id={{this.id}}">{{this.title}}</a></td>
+        </tr>
+    {{/each}}
+</table>    
+{{/if}}
+
+</body>
+</html>
