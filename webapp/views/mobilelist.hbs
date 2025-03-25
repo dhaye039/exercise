@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile Results</title>
+  <link href="/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-title">Search Results</div>
+    </header>
+
+    <div class="content">
+      {{#if error}}
+        <p style="color: red;">{{error}}</p>
+      {{/if}}
+
+      {{#if results}}
+        <p><strong>{{totalCount}} matches found.</strong></p>
+        <ul>
+          {{#each results}}
+            <li><a href="/mobile/details?book_id={{this.id}}">{{this.title}} - {{this.author}}</a></li>
+          {{/each}}
+        </ul>
+        
+        <!-- Pagination Controls -->
+        <p>
+          {{#if hasPrev}}
+            <a href="/mobile/search?title={{title}}&startIndex={{prevIndex}}">&lt;&lt; Prev</a>
+          {{/if}}
+
+          Page {{currentPage}} of {{totalPages}}
+
+          {{#if nextIndex}}
+            <a href="/mobile/search?title={{title}}&startIndex={{nextIndex}}">Next &gt;&gt;</a>
+          {{/if}}
+        </p>
+      {{/if}}
+    </div>
+
+    <div class="footer">
+      &copy; 2025 Library Search
+    </div>
+  </div>
+</body>
+</html>
