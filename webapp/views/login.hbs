@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<HTML>
+  <HEAD>
+    <title>Backwater Creek Community Library - Login</title>
+    <LINK href="/styles.css" type="text/css" rel="stylesheet">
+  </HEAD>
+  <body link="#660000">
+    <!-- begin header -->
+    <table width="100%" border="0">
+      <tr>
+        <td bgColor="#333333" colSpan="2">
+          <font face="arial, helvetica" color="#ffffff">Backwater Creek Community</font>
+        </td>
+      </tr>
+      <tr>
+        <td vAlign="top">
+          &nbsp;
+          <a href="/">Search</a> | 
+          <a href="/mobile/search">Mobile</a> | 
+          {{#if user}}
+            <a href="/logout">Logout</a>
+          {{else}}
+            <a href="/login">Login</a>
+          {{/if}}
+        </td>
+        <td align="right">
+          <IMG alt="Backwater Creek Community" src="/logo.jpg">
+        </td>
+      </tr>
+    </table>
+    <!-- end header -->
+    
+    <form method="post" action="/login">
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <table cellpadding="5" cellspacing="5" align="center">
+        <tr>
+          <td valign="top" align="right"><b>Username:</b></td>
+          <td valign="top">
+            <input name="username" type="text" value="{{username}}"/>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top" align="right"><b>Password:</b></td>
+          <td valign="top">
+            <input name="password" type="password"/>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" valign="top" align="right">
+            <input type="submit" name="btnLogin" value="Login"/>
+          </td>
+        </tr>
+      </table>
+      {{#if error}}
+        <p style="color: red; text-align: center;">{{error}}</p>
+      {{/if}}
+    </form>
+  </body>
+</HTML>

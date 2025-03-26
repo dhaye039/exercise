@@ -1,66 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Backwater Creek Community Library - Book Details</title>
-  <link href="/styles.css" rel="stylesheet">
+    <title>Backwater Creek Community Library - Book Details</title>
+    <link href="/styles.css" rel="stylesheet">
 </head>
 <body>
 
 <!-- begin header -->
 <table width="100%" border="0">
-  <tr>
-    <td bgColor="#333333" colSpan="2">
-      <font face="arial, helvetica" color="#ffffff">Backwater Creek Community</font>
-    </td>
-  </tr>
+    <tr>
+        <td bgColor="#333333" colSpan="2">
+            <font face="arial, helvetica" color="#ffffff">Backwater Creek Community</font>
+        </td>
+    </tr>
 
-  <tr>
-    <td vAlign="top">&nbsp;<a href="/">Search</a> | <a href="mobile/search">Mobile</a> | <a href="login">Login</a></td>
-    <td align="right">
-      <IMG alt="Backwater Creek Community" src="/logo.jpg">
-    </td>
-  </tr>
+    <tr>
+        <td vAlign="top">
+            &nbsp;
+            <a href="/">Search</a> | 
+            <a href="/mobile/search">Mobile</a> | 
+            {{#if user}}
+                <a href="/logout">Logout</a>
+            {{else}}
+                <a href="/login">Login</a>
+            {{/if}}
+        </td>
+        <td align="right">
+            <IMG alt="Backwater Creek Community" src="/logo.jpg">
+        </td>
+    </tr>
 </table>
 <!-- end header -->
 
 <table cellpadding="5" cellspacing="5" align="center" width="100%">
-  <tr>
-    <td align="right"><b>Title:</b></td>
-    <td>{{book.title}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Author:</b></td>
-    <td>{{book.author}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Additional Author:</b></td>
-    <td>{{book.addAuthor}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Call Number:</b></td>
-    <td>{{book.callNo}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Publication Info:</b></td>
-    <td>{{book.pubInfo}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Description:</b></td>
-    <td>{{book.descript}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Series:</b></td>
-    <td>{{book.series}}</td>
-  </tr>
-  <tr>
-    <td align="right"><b>Subject Categories:</b></td>
-    <td>
-      {{#each book.subjects}}
-        {{this}}<br>
-      {{/each}}
-    </td>
-  </tr>
+    <tr>
+        <td align="right"><b>Title:</b></td>
+        <td>{{book.title}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Author:</b></td>
+        <td>{{book.author}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Additional Author:</b></td>
+        <td>{{book.addAuthor}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Call Number:</b></td>
+        <td>{{book.callNo}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Publication Info:</b></td>
+        <td>{{book.pubInfo}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Description:</b></td>
+        <td>{{book.descript}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Series:</b></td>
+        <td>{{book.series}}</td>
+    </tr>
+    <tr>
+        <td align="right"><b>Subject Categories:</b></td>
+        <td>
+        {{#each book.subjects}}
+            {{this}}<br>
+        {{/each}}
+        </td>
+    </tr>
 </table>
+
+{{#if user}}
+    <form action="/maintain" method="get">
+        <input type="hidden" name="book_id" value="{{book.id}}">
+        <input type="submit" value="Maintenance">
+    </form>
+{{/if}}
 
 </body>
 </html>

@@ -15,7 +15,16 @@
 	</tr>
 
 	<tr>
-		<td vAlign="top">&nbsp;<a href="/">Search</a> | <a href="mobile/search">Mobile</a> | <a href="login">Login</a></td>
+		<td vAlign="top">
+            &nbsp;
+            <a href="/">Search</a> | 
+            <a href="/mobile/search">Mobile</a> | 
+            {{#if user}}
+                <a href="/logout">Logout</a>  <!-- Show Logout when logged in -->
+            {{else}}
+                <a href="/login">Login</a>  <!-- Show Login when logged out -->
+            {{/if}}
+        </td>
 		<td align="right">
 			<IMG alt="Backwater Creek Community" src="/logo.jpg">
 		</td>

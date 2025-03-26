@@ -1,27 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Details</title>
-  <link href="/styles.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Details</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .search-button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 16px;
+        }
+
+        .book-item {
+            border: 1px solid #eee;
+            padding: 16px;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .book-item h2 {
+            margin-bottom: 8px;
+            font-size: 22px;
+            color: #4CAF50;
+        }
+
+        .book-item p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .book-item p strong {
+            display: inline-block;
+            width: 80px;
+        }
+
+        .footer {
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer a.nav-button {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        .footer a.nav-button:hover {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        /* Mobile Styling */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                margin: 0 5px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <header>
-      <div class="header-title">Book Details</div>
-    </header>
+    <div class="container">
+        <header>
+            <button class="search-button" onclick="history.back()">Back</button>
+            <div class="header-title">Book Details</div>
+            <div style="width: 60px;"></div>
+        </header>
 
-    <div class="content">
-      <p><strong>Title:</strong> {{book.title}}</p>
-      <p><strong>Author:</strong> {{book.author}}</p>
-      <p><strong>Publication Info:</strong> {{book.pubInfo}}</p>
-      <p><strong>Description:</strong> {{book.descript}}</p>
+        <div class="content">
+            <article class="book-item">
+                <h2>{{book.title}}</h2>
+                <p><strong>Author:</strong> {{book.author}}</p>
+                <p><strong>Publication Info:</strong> {{book.pubInfo}}</p>
+                <p><strong>Description:</strong> {{book.descript}}</p>
+            </article>
+        </div>
     </div>
-
-    <div class="footer">
-      &copy; 2025 Library Search
-    </div>
-  </div>
 </body>
+
 </html>

@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 
 var Item = require('../models/item');
+var { router: authRouter, authMiddleware } = require('../routes/auth');
+
+router.use('/', authRouter);
 
 /**
  * Validates that the search string contains only allowed characters.
@@ -12,14 +15,14 @@ function isValidSearch(input) {
     // Allows letters, digits, spaces, and apostrophes.
     let regex = /^[a-zA-Z0-9' ]+$/;
     return regex.test(input);
-  }
+}
 
-/* GET home page. */
+// GET home page.
 router.get('/', function (req, res, next) {
-    res.render('index');    
+    res.render('index', { user: req.session.user });    
 });
 
-/* GET search page. */
+// GET search page.
 router.get('/search', (req, res) => {
     let title = req.query.title || '';
     let startIndex = parseInt(req.query.startIndex, 10) || 0; 
@@ -52,7 +55,8 @@ router.get('/search', (req, res) => {
             let prevIndex = startIndex - limit >= 0 ? startIndex - limit : null;
             let hasPrev = prevIndex !== null;
 
-            res.render('index', { 
+            res.render('index', {
+                user: req.session.user, 
                 title, 
                 results, 
                 totalCount, 
@@ -68,7 +72,7 @@ router.get('/search', (req, res) => {
     });
 });
 
-/* GET details page. */
+// GET details page.
 router.get('/details', (req, res) => {
     let bookId = req.query.book_id;
 
@@ -88,7 +92,7 @@ router.get('/details', (req, res) => {
         }
 
         // Render details page
-        res.render('details', { book });
+        res.render('details', { user: req.session.user, book });
     });
 });
 
@@ -140,6 +144,7 @@ router.get('/mobile/search', (req, res) => {
     });
 });
 
+// Mobile details page
 router.get('/mobile/details', (req, res) => {
     let bookId = parseInt(req.query.book_id, 10);
 
@@ -161,5 +166,56 @@ router.get('/mobile/details', (req, res) => {
     });
 });
 
+// maintain page
+router.get('/maintain', authMiddleware, (req, res) => {
+    let bookId = parseInt(req.query.book_id, 10);
+    
+    if (isNaN(bookId)) {
+        return res.status(400).send("Invalid book ID.");
+    }
+
+    Item.getDetails(bookId, (err, book) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).send("An error occurred.");
+        }
+
+        if (!book) {
+            return res.status(404).send("Book not found.");
+        }
+
+        res.render('maintain', { book, user: req.session.user });
+    });
+});
+
+// maintain form
+router.post('/maintain', authMiddleware, (req, res) => {
+    let { book_id, callNo, author, title, pubInfo, descript, series, addAuthor, updateCount } = req.body;
+
+    if (req.body.btnCancel) {
+        return res.redirect(`/details?book_id=${book_id}`);
+    }
+
+    // check for required fields
+    if (!callNo || !callNo.trim() || !author || !author.trim() || !title || !title.trim()) {
+        return res.render('maintain', { error: "Call #, Author, and Title must be filled.", book: req.body });
+    }
+
+
+    // Call the Item.updateDetails function
+    Item.updateDetails(book_id, callNo, author, title, pubInfo, descript, series, addAuthor, updateCount, (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).send("An error occurred. Please try again.");
+        }
+
+        if (result && result.error) {
+            return res.render('maintain', { error: result.error, book: req.body });
+        }
+
+        // Redirect to the details page if successful
+        res.redirect(`/details?book_id=${book_id}`);
+    });
+});
 
 module.exports = router;
