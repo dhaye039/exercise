@@ -28,6 +28,7 @@ router.post('/login', (req, res) => {
 
         // Compare password with the stored hashed password
         bcrypt.compare(password, user.Password, function (err, match) {
+            console.log(password, " ", user.Password);
             if (err) return res.status(500).send(`Database error (auth.js 26): ${err}`);
             if (!match) {
                 return res.render('login', { error: "Invalid username or password" });
