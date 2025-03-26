@@ -4,12 +4,12 @@ var bcrypt = require('bcrypt');
 
 var Item = require('../models/item');
 
-// login page
+// Login page
 router.get('/login', (req, res) => {
     res.render('login', { error: null });
 });
 
-// login form submission
+// Login form submission
 router.post('/login', (req, res) => {
     let { username, password } = req.body;
 
@@ -20,14 +20,14 @@ router.post('/login', (req, res) => {
             return res.render('login', { error: "Invalid username or password" });
         }
 
-        let user = results[0];  // Assume first result is the user object
+        let user = results[0];
 
         if (!user || !user.Password) {  // Ensure user and password exist
             return res.render('login', { error: "Invalid username or password" });
         }
 
         // Compare password with the stored hashed password
-        bcrypt.compare(password, user.Password, function(err, match) {
+        bcrypt.compare(password, user.Password, function (err, match) {
             if (err) return res.status(500).send(`Database error (auth.js 26): ${err}`);
             if (!match) {
                 return res.render('login', { error: "Invalid username or password" });
@@ -40,14 +40,14 @@ router.post('/login', (req, res) => {
     });
 });
 
-// logout route
+// Logout route
 router.get('/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/login');
     });
 });
 
-// middleware
+// Middleware
 function authMiddleware(req, res, next) {
     if (!req.session.user) {
         return res.status(403).send("Unauthorized: Please log in first.");

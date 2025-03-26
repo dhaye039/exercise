@@ -23,7 +23,7 @@ Item.search = function (title, limit, offset, callback) {
         let values = [`%${title}%`, limit, offset];
 
         connection.query(query, values, function (err, data) {
-            connection.release();              
+            connection.release();
             if (err) return callback(err);
 
             if (data) {
@@ -89,7 +89,7 @@ Item.getDetails = function (bookId, callback) {
     });
 };
 
-Item.login = function (username, password) {    
+Item.login = function (username, password) {
     db.pool.getConnection((err, connection) => {
         if (err) return res.status(500).send(`Database error (item.js 93): ${err}`);
 
@@ -151,7 +151,6 @@ Item.updateDetails = function (book_id, callNo, author, title, pubInfo, descript
                 connection.release();
                 return callback(null, { error: "This record has been updated by another user. Please refresh." });
             }
-
 
             // Update the book record
             connection.query(

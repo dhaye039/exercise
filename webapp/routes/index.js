@@ -166,7 +166,7 @@ router.get('/mobile/details', (req, res) => {
     });
 });
 
-// maintain page
+// Maintain page
 router.get('/maintain', authMiddleware, (req, res) => {
     let bookId = parseInt(req.query.book_id, 10);
     
@@ -188,7 +188,7 @@ router.get('/maintain', authMiddleware, (req, res) => {
     });
 });
 
-// maintain form
+// Maintain form
 router.post('/maintain', authMiddleware, (req, res) => {
     let { book_id, callNo, author, title, pubInfo, descript, series, addAuthor, updateCount } = req.body;
 
@@ -196,7 +196,7 @@ router.post('/maintain', authMiddleware, (req, res) => {
         return res.redirect(`/details?book_id=${book_id}`);
     }
 
-    // check for required fields
+    // Check for required fields
     if (!callNo || !callNo.trim() || !author || !author.trim() || !title || !title.trim()) {
         return res.render('maintain', { error: "Call #, Author, and Title must be filled.", book: req.body });
     }

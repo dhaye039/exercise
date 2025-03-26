@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>BCCL - Book Details</title>
-        <link href="/styles.css" type="text/css" rel="stylesheet">
-    </head>
-    <body link="#660000">
-        <form method="post" action="/maintain">
-            <input type="hidden" name="book_id" value="{{book.id}}">
-            <input type="hidden" name="updateCount" value="{{book.updateCount}}">
+
+<head>
+    <title>BCCL - Book Details</title>
+    <link href="/styles.css" type="text/css" rel="stylesheet">
+</head>
+
+<body link="#660000">
+    <form method="post" action="/maintain">
+        <input type="hidden" name="book_id" value="{{book.id}}">
+        <input type="hidden" name="updateCount" value="{{book.updateCount}}">
 
         <!-- begin header -->
         <table width="100%" border="0">
@@ -20,12 +22,12 @@
             <tr>
                 <td vAlign="top">
                     &nbsp;
-                    <a href="/search">Search</a> | 
-                    <a href="/mobile/search">Mobile</a> | 
+                    <a href="/search">Search</a> |
+                    <a href="/mobile/search">Mobile</a> |
                     {{#if user}}
-                        <a href="/logout">Logout</a>
+                    <a href="/logout">Logout</a>
                     {{else}}
-                        <a href="/login">Login</a>
+                    <a href="/login">Login</a>
                     {{/if}}
                 </td>
                 <td align="right">
@@ -65,10 +67,10 @@
                 <td vAlign="top"><input name="series" type="text" value="{{book.series}}" /></td>
             </tr>
             {{#if error}}
-                <tr>
-                    <td>&nbsp;</td>
-                    <td style="color:red;">{{error}}</td>
-                </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td style="color:red;">{{error}}</td>
+            </tr>
             {{/if}}
             <tr>
                 <td>&nbsp;</td>
@@ -78,8 +80,9 @@
                 </td>
             </tr>
 
-            
+
         </table>
     </form>
 </body>
+
 </html>
