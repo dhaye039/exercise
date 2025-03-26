@@ -21,7 +21,6 @@ router.post('/login', (req, res) => {
         }
 
         let user = results[0];
-        console.log(user);
 
         if (!user || !user.Password) {  // Ensure user and password exist
             return res.render('login', { error: "Invalid username or password2" });
