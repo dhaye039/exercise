@@ -17,21 +17,21 @@ router.post('/login', (req, res) => {
     Item.getUser(username, (err, results) => {
         if (err) return res.status(500).send(`Database error: ${err}`);
         if (!results || results.length === 0) {  // Check if user was found
-            return res.render('login', { error: "Invalid username or password" });
+            return res.render('login', { error: "Invalid username or password1" });
         }
 
         let user = results[0];
+        console.log(user);
 
         if (!user || !user.Password) {  // Ensure user and password exist
-            return res.render('login', { error: "Invalid username or password" });
+            return res.render('login', { error: "Invalid username or password2" });
         }
 
         // Compare password with the stored hashed password
         bcrypt.compare(password, user.Password, function (err, match) {
-            console.log(password, " ", user.Password);
-            if (err) return res.status(500).send(`Database error (auth.js 26): ${err}`);
+            if (err) return res.status(500).send(`Database error: ${err}`);
             if (!match) {
-                return res.render('login', { error: "Invalid username or password" });
+                return res.render('login', { error: "Invalid username or password3" });
             }
 
             // Store user session
