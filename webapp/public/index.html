@@ -164,7 +164,8 @@
 
                         await sleep(1000);
 
-                        if (data.status === 'S') {
+                        if (!this.basket.some(item => item.id === this.itemId)) {
+                            if (data.status === 'S') {
                             this.basket.push({
                                 id: this.itemId,
                                 title: data.title,
@@ -172,8 +173,11 @@
                             });
                             this.saveBasket();
                             this.itemId = '';
+                            } else {
+                                this.errorMsg = 'Item not available for checkout.';
+                            }
                         } else {
-                            this.errorMsg = 'Item not available for checkout.';
+                            this.errorMsg = 'Item is already in the basket.';
                         }
                     } catch (err) {
                         this.errorMsg = 'Unable to retrieve item info.';
