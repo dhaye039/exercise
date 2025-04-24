@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Library Self Checkout</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: auto;
+            padding: 5px;
+        }
+
+        .div {
+            margin: auto;
+            width: 100%;
+            padding: 5px;
+        }
+
+        .title {
+            width: 100%;
+            border: 2px solid black;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .title2 {
+            margin: auto;
+            width: 50%;
+            border: 2px solid black;
+            text-align: center;
+        }
+
+        .table {
+            margin: auto;
+            width: 100%;
+        }
+
+        .table2 {
+            margin: auto;
+            padding: 20px;
+        }
+
+        .a1 {
+            text-align: center;
+            padding: 1%;
+            font-size: 12px;
+        }
+
+        .a2 {
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+
+        .error {
+            text-align: center;
+            color: red
+        }
+
+        .button {
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            margin: 4px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        /* td {
+                border: 2px solid red;
+            } */
+    </style>
+    <style>
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+
+        #loading img {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import { createApp } from 'vue'
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        createApp({
+            data() {
+                return {
+                    currentPage: 'login',
+                    cardNumber: '',
+                    password: '',
+                    itemId: '',
+                    basket: [],
+                    errorMsg: '',
+                    successMsg: '',
+                }
+            },
+            methods: {
+                // validates if the card number and password are valid credentials
+                async validateCard() {
+                    this.clearMessages();
+                    this.show();
+
+                    try {
+                        var res = await fetch('/ajax/validateCard', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                cardNumber: this.cardNumber,
+                                password: this.password
+                            })
+                        });
+
+                        var data = await res.json();
+
+                        await sleep(1000);
+
+                        if (data.success) {
+                            this.currentPage = 'main';
+                            this.loadBasket();
+                            document.getElementById('itemInput')?.focus();
+                        } else {
+                            this.errorMsg = 'Invalid card number or password.';
+                            document.getElementById('cardInput')?.focus();
+                        }
+                    } catch (err) {
+                        this.errorMsg = 'Unable to validate card. Try again later.';
+                        document.getElementById('cardInput')?.focus();
+                    } finally {
+                        this.hide();
+                    }
+                },
+
+                // adds an item to the basket for checking out
+                async addItem() {
+                    this.clearMessages();
+                    if (!this.itemId) return;
+                    this.show();
+
+                    try {
+                        var res = await fetch(`/ajax/itemInfo?itemId=${this.itemId}`);
+                        var data = await res.json();
+
+                        await sleep(1000);
+
+                        if (data.status === 'S') {
+                            this.basket.push({
+                                id: this.itemId,
+                                title: data.title,
+                                author: data.author
+                            });
+                            this.saveBasket();
+                            this.itemId = '';
+                        } else {
+                            this.errorMsg = 'Item not available for checkout.';
+                        }
+                    } catch (err) {
+                        this.errorMsg = 'Unable to retrieve item info.';
+                    } finally {
+                        this.hide();
+                        document.getElementById('itemInput')?.focus();
+                    }
+                },
+
+                // removes an item from the checkout list
+                removeItem(index) {
+                    this.basket.splice(index, 1);
+                    this.saveBasket();
+                },
+
+                // inserts a new entry to the db and changes   
+                // the status of all items in basket to 'C' 
+                async checkout() {
+                    this.clearMessages();
+                    if (this.basket.length === 0) {
+                        this.errorMsg = 'Basket is empty.';
+                        return;
+                    }
+                    if (this.basket.length > 3) {
+                        this.errorMsg = 'Cannot checkout more than 3 items.';
+                        return;
+                    }
+
+                    this.show();
+
+                    try {
+                        var res = await fetch('/ajax/checkoutItems', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                cardNumber: this.cardNumber,
+                                itemIds: this.basket.map(item => item.id)
+                            })
+                        });
+
+                        var data = await res.json();
+
+                        await sleep(1000);
+
+                        if (data.success) {
+                            this.successMsg = 'Checkout successful!';
+                            this.basket = [];
+                            setTimeout(() => {
+                                var cardNumber = parseInt(this.cardNumber, 10);
+                                localStorage.removeItem('basket.user-' + cardNumber);
+
+                                this.currentPage = 'login';
+                                this.cardNumber = '';
+                                this.password = '';
+                                document.getElementById('cardInput')?.focus();
+                            }, 1500);
+                        } else {
+                            this.errorMsg = data.error || 'Checkout failed.';
+                        }
+                    } catch (err) {
+                        this.errorMsg = 'Checkout error. Try again later.';
+                    } finally {
+                        this.hide();
+                    }
+                },
+
+                // saves basket to local storage
+                saveBasket() {
+                    var cardNumber = parseInt(this.cardNumber, 10);
+                    localStorage.setItem('basket.user-' + cardNumber, JSON.stringify(this.basket));
+                },
+
+                // loads basket from local storage
+                loadBasket() {
+                    var cardNumber = parseInt(this.cardNumber, 10);
+                    var saved = localStorage.getItem('basket.user-' + cardNumber);
+                    if (saved) {
+                        try {
+                            this.basket = JSON.parse(saved);
+                        } catch (e) {
+                            this.basket = [];
+                        }
+                    }
+                },
+
+                // logs user out of application
+                async logout() {
+
+                    this.show();
+
+                    await sleep(1000);
+
+                    fetch('/ajax/logout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                        .then(() => {
+                            this.clearMessages();
+                            this.basket = [];
+                            this.cardNumber = '';
+                            this.password = '';
+                            this.itemId = '';
+                            this.currentPage = 'login';
+                            this.$nextTick(() => document.getElementById('cardInput')?.focus());
+                        })
+                        .catch(() => {
+                            this.errorMsg = 'Logout failed. Try again.';
+                        });
+
+                    
+
+                    this.hide()
+                },
+
+                // shows spinner
+                show() {
+                    document.getElementById('loading').style.display = 'block';
+                },
+
+                // hides spinner
+                hide() {
+                    document.getElementById('loading').style.display = 'none';
+                },
+
+                // clears error and success messages
+                clearMessages() {
+                    this.errorMsg = '';
+                    this.successMsg = '';
+                }
+            },
+            mounted() {
+                document.getElementById('cardInput')?.focus();
+            }
+        }).mount('#app')
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-show="currentPage === 'login'" class="div">
+            <h2 class="title2">Library Self Checkout</h2>
+
+            <table class="table2">
+                <tr>
+                    <td style="text-align:right"><label for="cardInput">Enter Card Number: </label></td>
+                    <td><input id="cardInput" v-model="cardNumber" @keyup.enter="validateCard"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:right"><label for="passInput">Enter Password: </label></td>
+                    <td><input id="passInput" type="password" v-model="password" @keyup.enter="validateCard"></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <button @click="validateCard">Login</button>&nbsp;
+                    </td>
+
+                </tr>
+            </table>
+            <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
+
+
+        </div>
+
+        <div v-show="currentPage === 'main'" class="div">
+            <div class="title">
+                <h2>Backwater Creek Library</h2>
+                <h4>Patron Self Checkout</h4>
+            </div>
+            <p class="a1">Please scan your items to checkout</p>
+            <div style="text-align:center">
+                <label for="itemInput">Enter Item ID: </label>
+                <input id="itemInput" v-model="itemId" @keyup.enter="addItem">&nbsp;
+                <button class="button" @click="addItem">Add</button>
+            </div>
+            <table class="table">
+                <tr>
+                </tr>
+                <tr>
+                    <td style="width:30%">&nbsp;</td>
+                    <td style="width:70%">
+                        <p><u>Checkout Basket</u></p>
+                    </td>
+                </tr>
+                <tr v-for="(item, index) in basket" :key="item.id">
+                    <td style="text-align:right">
+                        <button class="button" @click="removeItem(index)">Del</button>
+                    </td>
+                    <td>
+                        {{ item.title }} by {{ item.author }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <button class="button" @click="checkout">Checkout</button>&nbsp;
+                        <button class="button" @click="logout">Logout</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div v-if="errorMsg" style="color:red">{{ errorMsg }}</div>
+                        <div v-if="successMsg" style="color:green">{{ successMsg }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="loading"><img src="images/hold-on.gif" alt="Loading..."></div>
+    </div>
+</body>
+
+</html>
