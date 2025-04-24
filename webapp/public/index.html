@@ -189,6 +189,7 @@
 
                 // removes an item from the checkout list
                 removeItem(index) {
+                    this.clearMessages();
                     this.basket.splice(index, 1);
                     this.saveBasket();
                 },
